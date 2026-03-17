@@ -37,7 +37,7 @@ enum layers {
 };
 
 #define LT_NAV_SPACE LT(_NAV, KC_SPC)
-#define LT_MDIA_SCLN LT(_MDIA, KC_SCLN)
+#define LT_MDIA_QUOT LT(_MDIA, KC_QUOT)
 #define MO_NAV MO(_NAV)
 #define OSL_NAVWIN OSL(_NAVWIN)
 #define MO_FUN MO(_FUN)
@@ -63,25 +63,23 @@ enum layers {
 #define RGB_DARK_WHITE LED_INTENSITY, LED_INTENSITY, LED_INTENSITY
 #define RGB_DARK_YELLOW LED_INTENSITY, LED_INTENSITY, 0x00
 
-enum combos { JK_ESC, COMMADOT_SEMICOLON, HCOMMA_HYPHEN, ZD_TAB, XD_CTRL, DH_CTRL, PREV_NEXT_SELECT_ALL, COMBO_LENGTH };
+enum combos { JK_ESC, COMMADOT_SEMICOLON, MCOMMA_HYPHEN, ZV_TAB, XV_CTRL, PREV_NEXT_SELECT_ALL, COMBO_LENGTH };
 uint16_t COMBO_LEN = COMBO_LENGTH;
 
 const uint16_t PROGMEM jk_esc[]                = {KC_J, KC_K, COMBO_END};
 const uint16_t PROGMEM commadot_semicolon[]    = {KC_COMM, KC_DOT, COMBO_END};
-const uint16_t PROGMEM hcomma_hyphen[]         = {KC_H, KC_COMM, COMBO_END};
-const uint16_t PROGMEM xd_ctrl[]               = {KC_X, KC_D, COMBO_END};
-const uint16_t PROGMEM dh_ctrl[]               = {KC_D, KC_H, COMBO_END};
-const uint16_t PROGMEM zd_tab[]                = {KC_Z, KC_D, COMBO_END};
+const uint16_t PROGMEM mcomma_hyphen[]         = {KC_M, KC_COMM, COMBO_END};
+const uint16_t PROGMEM xv_ctrl[]               = {KC_X, KC_V, COMBO_END};
+const uint16_t PROGMEM zv_tab[]                = {KC_Z, KC_V, COMBO_END};
 const uint16_t PROGMEM prev_next_select_all[]  = {PRV_TAB, NXT_TAB, COMBO_END};
 
 // clang-format off
 combo_t key_combos[] = {
     [JK_ESC]            = COMBO(jk_esc, KC_ESC),
     [COMMADOT_SEMICOLON]= COMBO(commadot_semicolon, KC_SCLN),
-    [HCOMMA_HYPHEN]     = COMBO(hcomma_hyphen, KC_MINS),
-    [XD_CTRL]           = COMBO(xd_ctrl, OS_CTRL),
-    [DH_CTRL]           = COMBO(dh_ctrl, OS_CTRL),
-    [ZD_TAB]            = COMBO(zd_tab, KC_TAB),
+    [MCOMMA_HYPHEN]     = COMBO(mcomma_hyphen, KC_MINS),
+    [XV_CTRL]           = COMBO(xv_ctrl, OS_CTRL),
+    [ZV_TAB]            = COMBO(zv_tab, KC_TAB),
     [PREV_NEXT_SELECT_ALL] = COMBO(prev_next_select_all, MW_SELECT_ALL),
 };
 // clang-format on
@@ -90,7 +88,7 @@ combo_t key_combos[] = {
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_BASE] = LAYOUT_split_3x5_3(
     KC_Q,   KC_W,    KC_E,    KC_R,    KC_T,                    KC_Y,     KC_U,    KC_I,    KC_O,      KC_P,
-    KC_A,   KC_S,    KC_D,    KC_F,    KC_G,                    KC_H,     KC_J,    KC_K,    KC_L,    LT_MDIA_SCLN,
+    KC_A,   KC_S,    KC_D,    KC_F,    KC_G,                    KC_H,     KC_J,    KC_K,    KC_L,    LT_MDIA_QUOT,
     KC_Z,   KC_X,    KC_C,    KC_V,    KC_B,                    KC_N,     KC_M, KC_COMM,  KC_DOT,      KC_SLSH,
                  MO_FUN,LT_NAV_SPACE,MO_NUM,                    OS_SHFT,MO_NAV, MO_SYMB
   ),
@@ -819,7 +817,7 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
             return TAPPING_TERM + 125;
         // I just hold my pinky down on O for too long for common words
         // like "out". An extra bit of time seems to help.
-        case LT_MDIA_SCLN:
+        case LT_MDIA_QUOT:
             return TAPPING_TERM + 50;
         default:
             return TAPPING_TERM;
