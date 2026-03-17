@@ -242,213 +242,226 @@ bool is_alt_held(void) { return get_mods() & MOD_BIT(KC_LALT); }
 
 #ifdef RGB_MATRIX_ENABLE
 // Note: all keys mentioned in this function go by QWERTY.
-// void rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-//     // Diagram of underglow LEDs on the LH side when viewed from above:
-//     // 2   1   0
-//     // 3   4   5
-//     // (i.e. LED 0 is underneath the "R" key on a QWERTY keyboard)
-//     //
-//     // Diagram of per-key LEDs on the LH side when viewed from above:
-//     //  23  18  17  10  9
-//     //  22  19  16  11  8
-//     //  21  20  15  12  7
-//     //           14  13  6
-//     //
-//     // LEDs 24, 25, and 26 don't exist.
-//     //
-//     // Diagram of underglow LEDs on the RH side when viewed from above:
-//     // 27  28  29
-//     // 32  31  30
-//     // (i.e. LED 29 is underneath the "P" key on a QWERTY keyboard)
-//     //
-//     // Diagram of per-key LEDs on the RH side when viewed from above:
-//     //   36  37  44  45  50
-//     //   35  38  43  46  49
-//     //   34  39  42  47  48
-//     //  33  40  41
-//
-//     // Set underglow
-//     if (is_mac_the_default()) {
-//         set_color_for_contiguous_keycodes(0, 5, 0x32, 0x32, 0x32);
-//         set_color_for_contiguous_keycodes(27, 32, 0x32, 0x32, 0x32);
-//     } else {
-//         set_color_for_contiguous_keycodes(0, 5, 0x00, 0x32, 0x00);
-//         set_color_for_contiguous_keycodes(27, 32, 0x00, 0x32, 0x00);
-//     }
-//
-//     switch (get_highest_layer(layer_state)) {
-//         case _BASE:
-//             // Common colors between Windows and Mac
-//             if (host_keyboard_leds()) {
-//                 // When caps lock is on, make it REALLY obvious.
-//                 // Don't change the underglow though so it's obvious whether I'm
-//                 // in Mac or Windows mode.
-//                 HSV hsv = {rgblight_get_hue(), rgblight_get_sat(), rgblight_get_val()};
-//                 RGB rgb = hsv_to_rgb(hsv);
-//                 set_color_for_contiguous_keycodes(6, 23, rgb.r, rgb.g, rgb.b);
-//                 set_color_for_contiguous_keycodes(33, 50, rgb.r, rgb.g, rgb.b);
-//             }
-//
-//             set_color_split(14, RGB_DARK_WHITE);  // LH thumb key 1
-//             // set_color_split(13, RGB_DARK_MAGENTA);  // LH thumb key 2
-//             set_color_split(6, RGB_DARK_GREEN);  // LH thumb key 3
-//             // set_color_split(33, RGB_DARK_BLUE);     // RH thumb key 1
-//             set_color_split(40, RGB_DARK_MAGENTA);  // RH thumb key 2
-//             set_color_split(41, RGB_DARK_BLUE);     // RH thumb key 3
-//
-//             break;
-//         case _SYMB: {
-//             light_up_right_mods(RGB_DARK_BLUE);
-//
-//             set_color_split(23, RGB_DARK_BLUE);    // 'Q' key
-//             set_color_split(18, RGB_DARK_CYAN);    // 'W' key
-//             set_color_split(17, RGB_DARK_BLUE);    // 'E' key
-//             set_color_split(10, RGB_DARK_CYAN);    // 'R' key
-//             set_color_split(9, RGB_DARK_BLUE);     // 'T' key
-//             set_color_split(22, RGB_DARK_BLUE);    // 'A' key
-//             set_color_split(19, RGB_DARK_CYAN);    // 'S' key
-//             set_color_split(16, RGB_DARK_YELLOW);  // 'D' key
-//             set_color_split(11, RGB_DARK_YELLOW);  // 'F' key
-//             set_color_split(8, RGB_DARK_BLUE);     // 'G' key
-//             set_color_split(21, RGB_DARK_BLUE);    // 'Z' key
-//             set_color_split(20, RGB_DARK_CYAN);    // 'X' key
-//             set_color_split(15, RGB_DARK_YELLOW);  // 'C' key
-//             set_color_split(12, RGB_DARK_YELLOW);  // 'V' key
-//             set_color_split(7, RGB_DARK_CYAN);     // 'B' key
-//             break;
-//         }
-//         case _NUM: {
-//             light_up_left_mods(RGB_DARK_GREEN);
-//             set_color_split(36, RGB_DARK_RED);  // 'Y' key
-//             if (host_keyboard_leds()) {
-//                 set_color_split(36, RGB_DARK_YELLOW);  // 'Y' key
-//             }
-//
-//             set_color_split(18, RGB_DARK_MAGENTA);  // 'W' key
-//             set_color_split(17, RGB_DARK_BLUE);     // 'E' key
-//             set_color_split(10, RGB_DARK_MAGENTA);  // 'R' key
-//             set_color_split(15, RGB_DARK_BLUE);     // 'C' key
-//
-//             set_color_split(49, RGB_DARK_BLUE);  // Period key
-//
-//             const uint8_t numpad_keycodes[] = {41, 37, 44, 45, 38, 43, 46, 39, 42, 47};
-//             set_all_keys_colors(numpad_keycodes, sizeof(numpad_keycodes) / sizeof(uint8_t), RGB_DARK_GREEN);
-//             break;
-//         }
-//         case _FUN: {
-//             light_up_left_mods(RGB_DARK_WHITE);
-//
-//             set_color_split(40, RGB_DARK_RED);  // Caps-lock key
-//             if (host_keyboard_leds()) {
-//                 set_color_split(40, RGB_DARK_MAGENTA);  // Caps-lock key
-//             }
-//             const uint8_t numpad_keycodes[] = {37, 44, 45, 38, 43, 46, 39, 42, 47, 50, 49, 48};
-//             set_all_keys_colors(numpad_keycodes, sizeof(numpad_keycodes) / sizeof(uint8_t), RGB_DARK_WHITE);
-//             break;
-//         }
-//         case _NAV: {
-//             light_up_left_mods(RGB_DARK_MAGENTA);
-//             set_color_split(34, RGB_DARK_WHITE);   // 'N' key
-//             set_color_split(39, RGB_DARK_RED);     // 'M' key
-//             set_color_split(42, RGB_DARK_WHITE);   // ',' key
-//             set_color_split(47, RGB_DARK_WHITE);   // '.' key
-//             set_color_split(48, RGB_DARK_RED);     // '/' key
-//             set_color_split(35, RGB_DARK_GREEN);   // 'H' key
-//             set_color_split(49, RGB_DARK_WHITE);   // ';' key
-//             set_color_split(36, RGB_DARK_GREEN);   // 'Y' key
-//             set_color_split(37, RGB_DARK_YELLOW);  // 'U' key
-//             set_color_split(45, RGB_DARK_YELLOW);  // 'O' key
-//             set_color_split(50, RGB_DARK_RED);     // 'P' key
-//
-//             set_color_split(23, RGB_DARK_WHITE);  // 'Q' key
-//             set_color_split(18, RGB_DARK_GREEN);  // 'W' key
-//             set_color_split(17, RGB_DARK_RED);    // 'E' key
-//             set_color_split(10, RGB_DARK_GREEN);  // 'R' key
-//             set_color_split(9, RGB_DARK_WHITE);   // 'T' key
-//             set_color_split(8, RGB_DARK_WHITE);   // 'G' key
-//
-//             const uint8_t keycodes[] = {44 /*I*/, 38 /*J*/, 43 /*K*/, 46 /*L*/};
-//             set_all_keys_colors(keycodes, sizeof(keycodes) / sizeof(uint8_t), RGB_DARK_MAGENTA);
-//             break;
-//         }
-//         case _NAVLH: {
-//             light_up_right_mods(RGB_DARK_MAGENTA);
-//
-//             set_color_split(7, RGB_DARK_WHITE);    // 'B' key
-//             set_color_split(12, RGB_DARK_RED);     // 'V' key
-//             set_color_split(15, RGB_DARK_WHITE);   // 'C' key
-//             set_color_split(20, RGB_DARK_WHITE);   // 'X' key
-//             set_color_split(21, RGB_DARK_RED);     // 'Z' key
-//             set_color_split(8, RGB_DARK_GREEN);    // 'G' key
-//             set_color_split(22, RGB_DARK_WHITE);   // 'A' key
-//             set_color_split(9, RGB_DARK_GREEN);    // 'T' key
-//             set_color_split(10, RGB_DARK_YELLOW);  // 'R' key
-//             set_color_split(18, RGB_DARK_YELLOW);  // 'W' key
-//             set_color_split(23, RGB_DARK_RED);     // 'Q' key
-//
-//             const uint8_t keycodes[] = {17 /*E*/, 19 /*S*/, 16 /*D*/, 11 /*F*/};
-//             set_all_keys_colors(keycodes, sizeof(keycodes) / sizeof(uint8_t), RGB_DARK_MAGENTA);
-//             break;
-//         }
-//         case _MDIA: {
-//             light_up_left_mods(RGB_DARK_CYAN);
-//
-//             const uint8_t media_keycodes[] = {37, 45, 39, 42, 47};
-//             set_all_keys_colors(media_keycodes, sizeof(media_keycodes) / sizeof(uint8_t), RGB_DARK_WHITE);
-//             set_color_split(34, RGB_DARK_RED);  // 'B' key
-//
-//             set_color_split(9, RGB_DARK_WHITE);  // CG_TOGG key
-//             set_color_split(23, RGB_DARK_RED);   // QK_BOOT key
-//
-//             set_color_split(50, RGB_DARK_YELLOW);  // 'P' key
-//
-//             set_color_split(36, RGB_DARK_GREEN);  // 'Y' key
-//             set_color_split(35, RGB_DARK_GREEN);  // 'H' key
-//
-//             const uint8_t keycodes[] = {44 /*I*/, 38 /*J*/, 43 /*K*/, 46 /*L*/, 33, 40, 41};
-//             set_all_keys_colors(keycodes, sizeof(keycodes) / sizeof(uint8_t), RGB_DARK_CYAN);
-//             break;
-//         }
-//         default:
-//             break;
-//     }
-//
-//     // Make it easy to tell when each home-row mod is held for long enough by
-//     // lighting up the corresponding LEDs on both sides of the keyboard.
-//     //
-//     // Keep in mind that this shows over all layers and lights up both halves of
-//     // the keyboard, so it's good if you care more about your modifier status
-//     // than you do the regular LED color (i.e. it's good if you know your layout
-//     // well enough already).
-//     if (is_shift_held()) {
-//         set_color_split(11, RGB_DARK_YELLOW);  // 'F' key
-//         set_color_split(38, RGB_DARK_YELLOW);  // 'J' key
-//     }
-//     if (get_mods() & MOD_BIT(KC_LALT)) {
-//         set_color_split(19, RGB_DARK_YELLOW);  // 'S' key
-//         set_color_split(46, RGB_DARK_YELLOW);  // 'L' key
-//     }
-//
-//     if (is_mac_the_default()) {
-//         if (is_ctrl_held()) {
-//             set_color_split(22, RGB_DARK_YELLOW);  // 'A' key
-//             set_color_split(49, RGB_DARK_YELLOW);  // ';' key
-//         }
-//         if (is_gui_held()) {
-//             set_color_split(16, RGB_DARK_YELLOW);  // 'D' key
-//             set_color_split(43, RGB_DARK_YELLOW);  // 'K' key
-//         }
-//     } else {
-//         if (is_gui_held()) {
-//             set_color_split(22, RGB_DARK_YELLOW);  // 'A' key
-//             set_color_split(49, RGB_DARK_YELLOW);  // ';' key
-//         }
-//         if (is_ctrl_held()) {
-//             set_color_split(16, RGB_DARK_YELLOW);  // 'D' key
-//             set_color_split(43, RGB_DARK_YELLOW);  // 'K' key
-//         }
-//     }
-// }
+bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+    // Diagram of underglow LEDs on the LH side when viewed from above:
+    // 2   1   0
+    // 3   4   5
+    // (i.e. LED 0 is underneath the "R" key on a QWERTY keyboard)
+    //
+    // Diagram of per-key LEDs on the LH side when viewed from above:
+    //  23  18  17  10  9
+    //  22  19  16  11  8
+    //  21  20  15  12  7
+    //           14  13  6
+    //
+    // LEDs 24, 25, and 26 don't exist.
+    //
+    // Diagram of underglow LEDs on the RH side when viewed from above:
+    // 27  28  29
+    // 32  31  30
+    // (i.e. LED 29 is underneath the "P" key on a QWERTY keyboard)
+    //
+    // Diagram of per-key LEDs on the RH side when viewed from above:
+    //   36  37  44  45  50
+    //   35  38  43  46  49
+    //   34  39  42  47  48
+    //  33  40  41
+    if (is_shift_held()) {
+        set_color_split(5, RGB_WHITE);
+    }
+    if (is_ctrl_held()) {
+        set_color_split(10, RGB_WHITE);
+    }
+    if (is_gui_held()) {
+        set_color_split(16, RGB_WHITE);
+    }
+    if (is_alt_held()) {
+        set_color_split(13, RGB_WHITE);
+    }
+
+    // Set underglow
+    // if (is_mac_the_default()) {
+    //     set_color_for_contiguous_keycodes(0, 5, 0x32, 0x32, 0x32);
+    //     set_color_for_contiguous_keycodes(27, 32, 0x32, 0x32, 0x32);
+    // } else {
+    //     set_color_for_contiguous_keycodes(0, 5, 0x00, 0x32, 0x00);
+    //     set_color_for_contiguous_keycodes(27, 32, 0x00, 0x32, 0x00);
+    // }
+    //
+    // switch (get_highest_layer(layer_state)) {
+    //     case _BASE:
+    //         // Common colors between Windows and Mac
+    //         if (host_keyboard_leds()) {
+    //             // When caps lock is on, make it REALLY obvious.
+    //             // Don't change the underglow though so it's obvious whether I'm
+    //             // in Mac or Windows mode.
+    //             HSV hsv = {rgblight_get_hue(), rgblight_get_sat(), rgblight_get_val()};
+    //             RGB rgb = hsv_to_rgb(hsv);
+    //             set_color_for_contiguous_keycodes(6, 23, rgb.r, rgb.g, rgb.b);
+    //             set_color_for_contiguous_keycodes(33, 50, rgb.r, rgb.g, rgb.b);
+    //         }
+    //
+    //         set_color_split(14, RGB_DARK_WHITE);  // LH thumb key 1
+    //         // set_color_split(13, RGB_DARK_MAGENTA);  // LH thumb key 2
+    //         set_color_split(6, RGB_DARK_GREEN);  // LH thumb key 3
+    //         // set_color_split(33, RGB_DARK_BLUE);     // RH thumb key 1
+    //         set_color_split(40, RGB_DARK_MAGENTA);  // RH thumb key 2
+    //         set_color_split(41, RGB_DARK_BLUE);     // RH thumb key 3
+    //
+    //         break;
+    //     case _SYMB: {
+    //         light_up_right_mods(RGB_DARK_BLUE);
+    //
+    //         set_color_split(23, RGB_DARK_BLUE);    // 'Q' key
+    //         set_color_split(18, RGB_DARK_CYAN);    // 'W' key
+    //         set_color_split(17, RGB_DARK_BLUE);    // 'E' key
+    //         set_color_split(10, RGB_DARK_CYAN);    // 'R' key
+    //         set_color_split(9, RGB_DARK_BLUE);     // 'T' key
+    //         set_color_split(22, RGB_DARK_BLUE);    // 'A' key
+    //         set_color_split(19, RGB_DARK_CYAN);    // 'S' key
+    //         set_color_split(16, RGB_DARK_YELLOW);  // 'D' key
+    //         set_color_split(11, RGB_DARK_YELLOW);  // 'F' key
+    //         set_color_split(8, RGB_DARK_BLUE);     // 'G' key
+    //         set_color_split(21, RGB_DARK_BLUE);    // 'Z' key
+    //         set_color_split(20, RGB_DARK_CYAN);    // 'X' key
+    //         set_color_split(15, RGB_DARK_YELLOW);  // 'C' key
+    //         set_color_split(12, RGB_DARK_YELLOW);  // 'V' key
+    //         set_color_split(7, RGB_DARK_CYAN);     // 'B' key
+    //         break;
+    //     }
+    //     case _NUM: {
+    //         light_up_left_mods(RGB_DARK_GREEN);
+    //         set_color_split(36, RGB_DARK_RED);  // 'Y' key
+    //         if (host_keyboard_leds()) {
+    //             set_color_split(36, RGB_DARK_YELLOW);  // 'Y' key
+    //         }
+    //
+    //         set_color_split(18, RGB_DARK_MAGENTA);  // 'W' key
+    //         set_color_split(17, RGB_DARK_BLUE);     // 'E' key
+    //         set_color_split(10, RGB_DARK_MAGENTA);  // 'R' key
+    //         set_color_split(15, RGB_DARK_BLUE);     // 'C' key
+    //
+    //         set_color_split(49, RGB_DARK_BLUE);  // Period key
+    //
+    //         const uint8_t numpad_keycodes[] = {41, 37, 44, 45, 38, 43, 46, 39, 42, 47};
+    //         set_all_keys_colors(numpad_keycodes, sizeof(numpad_keycodes) / sizeof(uint8_t), RGB_DARK_GREEN);
+    //         break;
+    //     }
+    //     case _FUN: {
+    //         light_up_left_mods(RGB_DARK_WHITE);
+    //
+    //         set_color_split(40, RGB_DARK_RED);  // Caps-lock key
+    //         if (host_keyboard_leds()) {
+    //             set_color_split(40, RGB_DARK_MAGENTA);  // Caps-lock key
+    //         }
+    //         const uint8_t numpad_keycodes[] = {37, 44, 45, 38, 43, 46, 39, 42, 47, 50, 49, 48};
+    //         set_all_keys_colors(numpad_keycodes, sizeof(numpad_keycodes) / sizeof(uint8_t), RGB_DARK_WHITE);
+    //         break;
+    //     }
+    //     case _NAV: {
+    //         light_up_left_mods(RGB_DARK_MAGENTA);
+    //         set_color_split(34, RGB_DARK_WHITE);   // 'N' key
+    //         set_color_split(39, RGB_DARK_RED);     // 'M' key
+    //         set_color_split(42, RGB_DARK_WHITE);   // ',' key
+    //         set_color_split(47, RGB_DARK_WHITE);   // '.' key
+    //         set_color_split(48, RGB_DARK_RED);     // '/' key
+    //         set_color_split(35, RGB_DARK_GREEN);   // 'H' key
+    //         set_color_split(49, RGB_DARK_WHITE);   // ';' key
+    //         set_color_split(36, RGB_DARK_GREEN);   // 'Y' key
+    //         set_color_split(37, RGB_DARK_YELLOW);  // 'U' key
+    //         set_color_split(45, RGB_DARK_YELLOW);  // 'O' key
+    //         set_color_split(50, RGB_DARK_RED);     // 'P' key
+    //
+    //         set_color_split(23, RGB_DARK_WHITE);  // 'Q' key
+    //         set_color_split(18, RGB_DARK_GREEN);  // 'W' key
+    //         set_color_split(17, RGB_DARK_RED);    // 'E' key
+    //         set_color_split(10, RGB_DARK_GREEN);  // 'R' key
+    //         set_color_split(9, RGB_DARK_WHITE);   // 'T' key
+    //         set_color_split(8, RGB_DARK_WHITE);   // 'G' key
+    //
+    //         const uint8_t keycodes[] = {44 /*I*/, 38 /*J*/, 43 /*K*/, 46 /*L*/};
+    //         set_all_keys_colors(keycodes, sizeof(keycodes) / sizeof(uint8_t), RGB_DARK_MAGENTA);
+    //         break;
+    //     }
+    //     case _NAVLH: {
+    //         light_up_right_mods(RGB_DARK_MAGENTA);
+    //
+    //         set_color_split(7, RGB_DARK_WHITE);    // 'B' key
+    //         set_color_split(12, RGB_DARK_RED);     // 'V' key
+    //         set_color_split(15, RGB_DARK_WHITE);   // 'C' key
+    //         set_color_split(20, RGB_DARK_WHITE);   // 'X' key
+    //         set_color_split(21, RGB_DARK_RED);     // 'Z' key
+    //         set_color_split(8, RGB_DARK_GREEN);    // 'G' key
+    //         set_color_split(22, RGB_DARK_WHITE);   // 'A' key
+    //         set_color_split(9, RGB_DARK_GREEN);    // 'T' key
+    //         set_color_split(10, RGB_DARK_YELLOW);  // 'R' key
+    //         set_color_split(18, RGB_DARK_YELLOW);  // 'W' key
+    //         set_color_split(23, RGB_DARK_RED);     // 'Q' key
+    //
+    //         const uint8_t keycodes[] = {17 /*E*/, 19 /*S*/, 16 /*D*/, 11 /*F*/};
+    //         set_all_keys_colors(keycodes, sizeof(keycodes) / sizeof(uint8_t), RGB_DARK_MAGENTA);
+    //         break;
+    //     }
+    //     case _MDIA: {
+    //         light_up_left_mods(RGB_DARK_CYAN);
+    //
+    //         const uint8_t media_keycodes[] = {37, 45, 39, 42, 47};
+    //         set_all_keys_colors(media_keycodes, sizeof(media_keycodes) / sizeof(uint8_t), RGB_DARK_WHITE);
+    //         set_color_split(34, RGB_DARK_RED);  // 'B' key
+    //
+    //         set_color_split(9, RGB_DARK_WHITE);  // CG_TOGG key
+    //         set_color_split(23, RGB_DARK_RED);   // QK_BOOT key
+    //
+    //         set_color_split(50, RGB_DARK_YELLOW);  // 'P' key
+    //
+    //         set_color_split(36, RGB_DARK_GREEN);  // 'Y' key
+    //         set_color_split(35, RGB_DARK_GREEN);  // 'H' key
+    //
+    //         const uint8_t keycodes[] = {44 /*I*/, 38 /*J*/, 43 /*K*/, 46 /*L*/, 33, 40, 41};
+    //         set_all_keys_colors(keycodes, sizeof(keycodes) / sizeof(uint8_t), RGB_DARK_CYAN);
+    //         break;
+    //     }
+    //     default:
+    //         break;
+    // }
+    //
+    // // Make it easy to tell when each home-row mod is held for long enough by
+    // // lighting up the corresponding LEDs on both sides of the keyboard.
+    // //
+    // // Keep in mind that this shows over all layers and lights up both halves of
+    // // the keyboard, so it's good if you care more about your modifier status
+    // // than you do the regular LED color (i.e. it's good if you know your layout
+    // // well enough already).
+    // if (is_shift_held()) {
+    //     set_color_split(11, RGB_DARK_YELLOW);  // 'F' key
+    //     set_color_split(38, RGB_DARK_YELLOW);  // 'J' key
+    // }
+    // if (get_mods() & MOD_BIT(KC_LALT)) {
+    //     set_color_split(19, RGB_DARK_YELLOW);  // 'S' key
+    //     set_color_split(46, RGB_DARK_YELLOW);  // 'L' key
+    // }
+    //
+    // if (is_mac_the_default()) {
+    //     if (is_ctrl_held()) {
+    //         set_color_split(22, RGB_DARK_YELLOW);  // 'A' key
+    //         set_color_split(49, RGB_DARK_YELLOW);  // ';' key
+    //     }
+    //     if (is_gui_held()) {
+    //         set_color_split(16, RGB_DARK_YELLOW);  // 'D' key
+    //         set_color_split(43, RGB_DARK_YELLOW);  // 'K' key
+    //     }
+    // } else {
+    //     if (is_gui_held()) {
+    //         set_color_split(22, RGB_DARK_YELLOW);  // 'A' key
+    //         set_color_split(49, RGB_DARK_YELLOW);  // ';' key
+    //     }
+    //     if (is_ctrl_held()) {
+    //         set_color_split(16, RGB_DARK_YELLOW);  // 'D' key
+    //         set_color_split(43, RGB_DARK_YELLOW);  // 'K' key
+    //     }
+    // }
+    return false;
+}
 #endif
 
 // Lots of this code comes from https://github.com/qmk/qmk_firmware/tree/c4551d7ef1ed2c1069f23cc8499b7c7fc30f3ecf/users/drashna/split
