@@ -90,7 +90,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_Q,   KC_W,    KC_E,    KC_R,    KC_T,                    KC_Y,     KC_U,    KC_I,    KC_O,      KC_P,
     KC_A,   KC_S,    KC_D,    KC_F,    KC_G,                    KC_H,     KC_J,    KC_K,    KC_L,    LT_MDIA_QUOT,
     KC_Z,   KC_X,    KC_C,    KC_V,    KC_B,                    KC_N,     KC_M, KC_COMM,  KC_DOT,      KC_SLSH,
-                 MO_FUN,LT_NAV_SPACE,MO_NUM,                    OS_SHFT,MO_NAV, MO_SYMB
+                       MO_FUN,MO_NAV,MO_NUM,                    OS_SHFT,LT_NAV_SPACE,MO_SYMB
   ),
 
   [_SYMB] = LAYOUT_split_3x5_3(
@@ -243,40 +243,35 @@ bool is_alt_held(void) { return get_mods() & MOD_BIT(KC_LALT); }
 #ifdef RGB_MATRIX_ENABLE
 // Note: all keys mentioned in this function go by QWERTY.
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-    // Diagram of underglow LEDs on the LH side when viewed from above:
-    // 2   1   0
-    // 3   4   5
-    // (i.e. LED 0 is underneath the "R" key on a QWERTY keyboard)
-    //
     // Diagram of per-key LEDs on the LH side when viewed from above:
-    //  23  18  17  10  9
-    //  22  19  16  11  8
-    //  21  20  15  12  7
-    //           14  13  6
-    //
-    // LEDs 24, 25, and 26 don't exist.
-    //
-    // Diagram of underglow LEDs on the RH side when viewed from above:
-    // 27  28  29
-    // 32  31  30
-    // (i.e. LED 29 is underneath the "P" key on a QWERTY keyboard)
+    //  17  12  11   4  3
+    //  16  13  10   5  2
+    //  15  14   9   6  1
+    //           8   7  0
     //
     // Diagram of per-key LEDs on the RH side when viewed from above:
     //   36  37  44  45  50
     //   35  38  43  46  49
     //   34  39  42  47  48
     //  33  40  41
+
+    // Led numbers for modifier indicators
+    const uint8_t shift_led = 5;
+    const uint8_t ctrl_led = 10;
+    const uint8_t alt_led = 13;
+    const uint8_t gui_led = 16;
+
     if (is_shift_held()) {
-        set_color_split(5, RGB_WHITE);
+        set_color_split(shift_led, RGB_WHITE);
     }
     if (is_ctrl_held()) {
-        set_color_split(10, RGB_WHITE);
-    }
-    if (is_gui_held()) {
-        set_color_split(16, RGB_WHITE);
+        set_color_split(ctrl_led, RGB_WHITE);
     }
     if (is_alt_held()) {
-        set_color_split(13, RGB_WHITE);
+        set_color_split(alt_led, RGB_WHITE);
+    }
+    if (is_gui_held()) {
+        set_color_split(gui_led, RGB_WHITE);
     }
 
     // Set underglow
@@ -826,8 +821,8 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
         // I was making a bunch of typos presumably due to this shortcut, so I'm
         // trying a much longer TAPPING_TERM so that I hopefully only hit this
         // intentionally.
-        case LT_NAV_SPACE:
-            return TAPPING_TERM + 125;
+        // case LT_NAV_SPACE:
+        //     return TAPPING_TERM + 125;
         // I just hold my pinky down on O for too long for common words
         // like "out". An extra bit of time seems to help.
         case LT_MDIA_QUOT:
